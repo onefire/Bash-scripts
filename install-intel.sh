@@ -3,7 +3,11 @@
 #Author: onefire <onefire.myself@gmail.com>
 #Date: 08/04/2012
 
-#This script installs the non commercial Fortran and C/C++ compilers from Intel on Linux machines. The installation is largely distro-independent. The compilers do have some dependencies, so you may have to install stuff before using this script (you need java, gcc, g++, cpio, libstdc++6 among other things), but for Debian distros (like Linux Mint) and Arch Linux, the script can check dependencies and install them if necessary. If you use an RPM based distro or something different like Gentoo, you may have to manually install some packages.
+#This script installs the non commercial Fortran and C/C++ compilers from Intel on Linux machines. For systems based on deb, rpm or pkg packages, the script also checks for the dependencies required by the compilers (Java, gcc, gcc, cpio and libstdc++) and installs them if necessary. The script was tested with Linux Mint 13, Fedora 17 and an updated version of Arch Linux, but it should also work on similar systems (i.e, Ubuntu, Red Hat, etc). If you use something different like Gentoo, you may have to install the dependencies yourself. 
+
+#On a newly installed Fedora 17, I had a couple of problems. First, unlike pretty much any other distro, wget is not installed by default, so you need to either install it (yum install wget) because the script needs it to download the files (alternatively, you can manually download the tarballs from Intel before runnihg the script). Second, you need to set selinux to "permissive" (by default, it is "enforcing), otherwise the install will fail. To do this, edit /etc/selinux/config and reboot the system. After the installation, you can set selinux to "enforcing"again if you want.
+
+#On other distributions, I did not have problems.    
 
 #TO DO: Extend this to other distributions
 
@@ -114,6 +118,53 @@ fi
 echo "End of dependencies check"
 }
 
+#Check for rpm based distributions
+check_rpm() {
+echo "This system seems to use rpm packages" 
+
+if [ `which java` ]
+then
+echo "Java is already installed"
+else
+echo "Installing Java..."
+yum -y install java
+fi
+
+if [ `which gcc` ]
+then
+echo "gcc is already installed"
+else
+echo "Installing gcc..."
+yum -y install gcc
+fi
+
+if [ `which g++` ]
+then
+echo "g++ is already installed"
+else
+echo "Installing g++..."
+yum -y install gcc-c++
+fi
+
+if [ `which cpio` ]
+then
+echo "cpio is already installed"
+else
+echo "Installing cpio..."
+yum -y install cpio
+fi
+
+#In arch the standard repositories still have libstdc++5 (kind of weird, check this later...) 
+if [ `rpm -qa | grep -i libstdc++` ]
+then
+echo "libstdc++ is already installed"
+else
+echo "Installing libstdc++..."
+yum -y install libstdc++
+fi
+
+echo "End of dependencies check"
+}
 if [ -d /var/cache/apt ]
 then
 check_debian
@@ -121,6 +172,10 @@ fi
 if [ -d /var/cache/pacman ]
 then 
 check_arch
+fi
+if [ -d /var/cache/yum ]
+then 
+check_rpm
 fi
 
 #record the current directory in case Intel's script change it
