@@ -64,7 +64,7 @@ makepkg -g PKGBUILD >> $file2
 nlines=`wc -l < $file1`
 #Now use a while loop, where in iteration $i we look for expressions (in the PKGBUILD) matching the $line-th line of $file1 and replace those with the $line-th line of $file2  
 line=1
-while [ "$line" != "$nlines" ]
+while [ "$line" != "$(($nlines+1))" ]
 do  
  #note how we combine head and tail to get a specific line of a file
  sed -e s/"`cat $file1 | head -n $line | tail -1`"/"`cat $file2 | head -n $line | tail -1`"/g  PKGBUILD > junk && mv junk PKGBUILD
