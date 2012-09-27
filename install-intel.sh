@@ -1,7 +1,9 @@
 #!/bin/bash
 
 #Author: onefire <onefire.myself@gmail.com>
-#Date: 08/04/2012
+#Date: 09/26/2012
+
+#UPDATE: The 2013 version works with C++! (it used to be incompatible with newer versions of gcc) 
 
 #This script installs the non commercial Fortran and C/C++ compilers from Intel on Linux machines. For systems based on deb, rpm or pkg packages, the script also checks for the dependencies required by the compilers (Java, gcc, gcc, cpio and libstdc++) and installs them if necessary. The script was tested with Linux Mint 13, Fedora 17 and an updated version of Arch Linux, but it should also work on similar systems (i.e, Ubuntu, Red Hat, etc). If you use something different like Gentoo, you may have to install the dependencies yourself. 
 
@@ -20,14 +22,15 @@
 #If you just need the Fortran compiler, use:
 #sudo ./install-intel.sh fortran Joe  
 
+#UPDATE: The comment below is no longer true. The current version installs both 32 bit and 64 bit tools.
 #The code installs the 64 bit only versions of the compilers, not only because the files are shorter, but because otherwise we need to get 32 bit libraries (like gcc-multilib) which, from my experience, are a pain and create all sorts of compatibility issues. Plus, in the future nobody is going to use 32 bit machines, so development for those is not going to be very important. But it should be trivial to patch it so that it installs the multilib versions.
 
 #Second argument is the name of the user 
 user=$2
 
 #cksums taken from Intel's website: http://software.intel.com/en-us/articles/intel-composer-xe-2011-checksums/ 
-cksumfortran="1799133635 419291246"
-cksumcpp="3263447103 810019679"
+cksumfortran="538868532 877165394"
+cksumcpp="2320263956 1615454731"
 
 echo "Checking dependencies..."
 #For Debian systems (Linux Mint, Ubuntu, etc) only, check if the dependencies are installed, otherwise install them
@@ -184,12 +187,12 @@ dir0=`pwd`
 fortran() {
 cd $dir0
 #Check if the correct version exists in the current directory. If it does not, download it.
-if [ -f l_fcompxe_intel64_2011.9.293.tgz ]
+if [ -f l_fcompxe_2013.0.079.tgz ]
 then
-echo "Found l_fcompxe_intel64_2011.9.293.tgz" 
+echo "Found l_fcompxe_2013.0.079.tgz" 
 else
-#Download the 64 bit only Intel compiler (no real need to bother with multilib)
-wget http://registrationcenter-download.intel.com/akdlm/irc_nas/2476/l_fcompxe_intel64_2011.9.293.tgz
+#Download the multilib version of the compiler
+wget http://registrationcenter-download.intel.com/akdlm/irc_nas/2724/l_fcompxe_2013.0.079.tgz
 fi
 
 #Check the authenticity of the download
@@ -216,12 +219,12 @@ echo "source /opt/intel/composer_xe_2011_sp1.9.293/bin/compilervars.sh intel64" 
 
 cplusplus() {
 cd $dir0
-if [ -f l_ccompxe_intel64_2011.10.319.tgz ]
+if [ -f l_ccompxe_2013.0.079.tgz ]
 then
-echo "Found l_ccompxe_intel64_2011.10.319.tgz"
+echo "Found l_ccompxe_2013.0.079.tgz"
 else  
-#Download the 64 bit only C/C++ compiler 
-wget http://registrationcenter-download.intel.com/akdlm/irc_nas/2567/l_ccompxe_intel64_2011.10.319.tgz
+#Download the multilib C/C++ compiler (the 2013 version works with C++!) 
+wget http://registrationcenter-download.intel.com/akdlm/irc_nas/2723/l_ccompxe_2013.0.079.tgz
 fi
 
 #Check the authenticity of the download
