@@ -111,7 +111,7 @@ check_arch()
 	fi
 
 	#In Arch the standard repositories still have libstdc++5 (kind of weird, check this later...) 
-	if [ `pacman -Qs libstdc++5` ]; then
+	if [ "`pacman -Qs libstdc++5`" ]; then
 		echo "libstdc++5 is already installed"
 	else
 		echo "Installing libstdc++5..."
@@ -244,7 +244,7 @@ dir0=`pwd`
 if [ $1 = "" -o $1 = "all" ]; then 
 	fortran
 	cplusplus
-elif [ $1 = "fortran" -o $1 = "cplusplus" ]
+elif [ $1 = "fortran" -o $1 = "cplusplus" ]; then
 	$1
 fi
 
