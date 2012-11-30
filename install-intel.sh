@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Author: onefire <onefire.myself@gmail.com>
-#Date: 09/26/2012
+#Date: 11/29/2012
 
 #UPDATE: The 2013 version works with C++! (it used to be incompatible with newer versions of gcc) 
 
@@ -28,8 +28,16 @@
 #The code installs the 64 bit only versions of the compilers, not only because the files are shorter, but because otherwise we need to get 32 bit libraries (like gcc-multilib) which, from my experience, are a pain and create all sorts of compatibility issues. Plus, in the future nobody is going to use 32 bit machines, so development for those is not going to be very important. But it should be trivial to patch it so that it installs the multilib versions.
 
 #cksums taken from Intel's website: http://software.intel.com/en-us/articles/intel-composer-xe-2013-checksums/ 
-cksumfortran="864428350 600026996"
-cksumcpp="2473358151 986991353"
+cksumfortran="3036105632 623550038"
+cksumcpp="1324706319 1014596286"
+
+#compiler versions
+version_fortran="2013.1.117"
+version_cpp="2013.1.117"
+
+#sources
+source_fortran="http://registrationcenter-download.intel.com/akdlm/irc_nas/2851/l_fcompxe_intel64_$version_fortran.tgz"
+source_cpp="http://registrationcenter-download.intel.com/akdlm/irc_nas/2850/l_ccompxe_intel64_$version_cpp.tgz"
 
 echo "Checking dependencies..."
 #For Debian systems (Linux Mint, Ubuntu, etc) only, check if the dependencies are installed, otherwise install them
@@ -168,17 +176,17 @@ fortran()
 {
 	cd $dir0
 	#Check if the correct version exists in the current directory. If it does not, download it.
-	if [ -f l_fcompxe_intel64_2013.0.079.tgz ]; then
-		echo "Found l_fcompxe_intel64_2013.0.079.tgz" 
+	if [ -f l_fcompxe_intel64_$version_fortran.tgz ]; then
+		echo "Found l_fcompxe_intel64_$version_fortran.tgz" 
 	else
 
 	#Download the multilib version of the compiler
-		wget http://registrationcenter-download.intel.com/akdlm/irc_nas/2724/l_fcompxe_intel64_2013.0.079.tgz 
+		wget $source_fortran 
 	fi
 
 	#Check the authenticity of the download
 	echo "Checking authenticity of the download..."
-	echo "$cksumfortran l_fcompxe_intel64_2013.0.079.tgz" > cksumfortran.txt
+	echo "$cksumfortran l_fcompxe_intel64_$version_fortran.tgz" > cksumfortran.txt
 	if [ "`cksum l_f*.tgz`" = "`cat cksumfortran.txt`" ]; then
 		echo "CKSUM TEST PASSED! PROCEEDING WITH THE INSTALLATION OF THE INTEL FORTRAN COMPILER..."
 	elif [ "`cksum l_f*.tgz`" != "`cat cksumfortran.txt`" ]; then
@@ -192,24 +200,24 @@ fortran()
 	./install.sh 
 
 	#Add the compilers to the PATH (only do it if it was not done already) 
-	if [ ! -f /etc/profile.d/intel.sh -o "`cat /etc/profile.d/intel.sh`" != "export PATH=/opt/intel/composer_xe_2013.0.079/bin/intel64:\$PATH" ]; then
-		echo "export PATH=/opt/intel/composer_xe_2013.0.079/bin/intel64:\$PATH" > /etc/profile.d/intel.sh 
+	if [ ! -f /etc/profile.d/intel.sh -o "`cat /etc/profile.d/intel.sh`" != "export PATH=/opt/intel/composer_xe_$version_fortran/bin/intel64:\$PATH" ]; then
+		echo "export PATH=/opt/intel/composer_xe_$version_fortran/bin/intel64:\$PATH" > /etc/profile.d/intel.sh 
 	fi
 }
 
 cplusplus() 
 {
 	cd $dir0
-	if [ -f l_ccompxe_intel64_2013.0.079.tgz ]; then
-		echo "Found l_ccompxe_intel64_2013.0.079.tgz"
+	if [ -f l_ccompxe_intel64_$version_cpp.tgz ]; then
+		echo "Found l_ccompxe_intel64_$version_cpp.tgz"
 	else  
 	#Download the multilib C/C++ compiler (the 2013 version works with C++!) 
-		wget http://registrationcenter-download.intel.com/akdlm/irc_nas/2723/l_ccompxe_intel64_2013.0.079.tgz
+		wget $source_cpp
 	fi
 
 	#Check the authenticity of the download
 	echo "Checking authenticity of the download..."
-	echo "$cksumcpp l_ccompxe_intel64_2013.0.079.tgz" > cksumc++.txt
+	echo "$cksumcpp l_ccompxe_intel64_$version_cpp.tgz" > cksumc++.txt
 	if [ "`cksum l_c*.tgz`" = "`cat cksumc++.txt`" ]; then
 		echo "CKSUM TEST PASSED! PROCEEDING WITH THE INSTALLATION OF THE INTEL C/C++ COMPILERS..."
 	elif [ "`cksum l_c*.tgz`" != "`cat cksumc++.txt`" ]; then
@@ -223,8 +231,8 @@ cplusplus()
 	./install.sh 
 
 		#Add the compilers to the PATH (only do it if it was not done already) 
-	if [ ! -f /etc/profile.d/intel.sh -o "`cat /etc/profile.d/intel.sh`" != "export PATH=/opt/intel/composer_xe_2013.0.079/bin/intel64:\$PATH" ]; then
-		echo "export PATH=/opt/intel/composer_xe_2013.0.079/bin/intel64:\$PATH" > /etc/profile.d/intel.sh 
+	if [ ! -f /etc/profile.d/intel.sh -o "`cat /etc/profile.d/intel.sh`" != "export PATH=/opt/intel/composer_xe_$version_cpp/bin/intel64:\$PATH" ]; then
+		echo "export PATH=/opt/intel/composer_xe_$version_cpp/bin/intel64:\$PATH" > /etc/profile.d/intel.sh 
 	fi
 }
 
@@ -241,7 +249,7 @@ fi
 dir0=`pwd`
 
 #Both Fortran and C/C++ are installed if user runs the script with no arguments or with "all" as the first argument. Otherwise, only one of the compilers is installed.
-if [ $1 = "" -o $1 = "all" ]; then 
+if [ "$1" = "" -o "$1" = "all" ]; then 
 	fortran
 	cplusplus
 elif [ $1 = "fortran" -o $1 = "cplusplus" ]; then
