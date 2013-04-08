@@ -28,16 +28,16 @@
 #The code installs the 64 bit only versions of the compilers, not only because the files are shorter, but because otherwise we need to get 32 bit libraries (like gcc-multilib) which, from my experience, are a pain and create all sorts of compatibility issues. Plus, in the future nobody is going to use 32 bit machines, so development for those is not going to be very important. But it should be trivial to patch it so that it installs the multilib versions.
 
 #cksums taken from Intel's website: http://software.intel.com/en-us/articles/intel-composer-xe-2013-checksums/ 
-cksumfortran="3036105632 623550038"
-cksumcpp="1324706319 1014596286"
+cksumfortran="2100081129 647353098"
+cksumcpp="54575748 1047097063"
 
 #compiler versions
-version_fortran="2013.1.117"
-version_cpp="2013.1.117"
+version_fortran="2013.3.163"
+version_cpp="2013.3.163"
 
 #sources
-source_fortran="http://registrationcenter-download.intel.com/akdlm/irc_nas/2851/l_fcompxe_intel64_$version_fortran.tgz"
-source_cpp="http://registrationcenter-download.intel.com/akdlm/irc_nas/2850/l_ccompxe_intel64_$version_cpp.tgz"
+source_fortran="http://registrationcenter-download.intel.com/akdlm/irc_nas/3055/l_fcompxe_intel64_$version_fortran.tgz"
+source_cpp="http://registrationcenter-download.intel.com/akdlm/irc_nas/3054/l_ccompxe_intel64_$version_cpp.tgz"
 
 echo "Checking dependencies..."
 #For Debian systems (Linux Mint, Ubuntu, etc) only, check if the dependencies are installed, otherwise install them
@@ -258,6 +258,6 @@ fi
 
 #clean up
 cd $dir0
-rm -rf l_fcompxe_intel64_2013.0.079 l_ccompxe_intel64_2013.0.079
+rm -rf l_fcompxe_intel64_$version_fortran l_ccompxe_intel64_$version_cpp
 rm *cksum*.txt
 
