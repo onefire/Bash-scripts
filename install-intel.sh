@@ -39,7 +39,37 @@ version_cpp="2013.4.183"
 source_fortran="http://registrationcenter-download.intel.com/akdlm/irc_nas/3174/l_fcompxe_intel64_$version_fortran.tgz"
 source_cpp="http://registrationcenter-download.intel.com/akdlm/irc_nas/3173/l_ccompxe_intel64_$version_cpp.tgz"
 
-echo "Checking dependencies..."
+#Check if license file is present.
+check_license()
+{
+  myarray=`find ./ -maxdepth 1 -name ".lic"`
+
+  count=${#myarray[@]}
+  #Abort if we do not find a lic file. 
+  if [ ! $count -eq 1 ]; then
+    echo "Could not find a .lic file. Exiting now..."
+    exit -1
+  else
+    echo "Found license file: $myarray"
+  fi     
+
+  return $myarray
+}
+
+#Produce silent install configuration file.
+get_init_file()
+{
+  cat << EOF > silent_install.ini
+    ACTIVATION=exist_lic
+    CONTINUE_WITH_INSTALLDIR_OVERWRITE=yes
+    CONTINUE_WITH_OPTIONAL_ERROR=yes
+    PSET_INSTALL_DIR=/opt/intel
+    INSTALL_MODE=NORPM
+    ACCEPT_EULA=accept
+    SEND_USAGE_DATA=no 
+  EOF
+}    
+
 #For Debian systems (Linux Mint, Ubuntu, etc) only, check if the dependencies are installed, otherwise install them
 check_debian() 
 {
@@ -236,6 +266,15 @@ cplusplus()
 	fi
 }
 
+#Find license file.
+license=check_license
+
+#Write configuration file.
+get_init_file 
+
+#Check dependencies.
+echo "Checking dependencies..."
+
 #Call the appropriate checks according to what we see in /var/cache
 if [ -d /var/cache/apt ]; then
 	check_debian
@@ -245,7 +284,7 @@ elif [ -d /var/cache/yum ]; then
 	check_rpm
 fi
 
-#record the current directory in case Intel's script change it
+#Record the current directory in case Intel's script changes it
 dir0=`pwd`
 
 #Both Fortran and C/C++ are installed if user runs the script with no arguments or with "all" as the first argument. Otherwise, only one of the compilers is installed.
@@ -256,7 +295,7 @@ elif [ $1 = "fortran" -o $1 = "cplusplus" ]; then
 	$1
 fi
 
-#clean up
+#Clean up
 cd $dir0
 rm -rf l_fcompxe_intel64_$version_fortran l_ccompxe_intel64_$version_cpp
 rm *cksum*.txt
