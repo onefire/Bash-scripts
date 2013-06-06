@@ -42,32 +42,36 @@ source_cpp="http://registrationcenter-download.intel.com/akdlm/irc_nas/3173/l_cc
 #Check if license file is present.
 check_license()
 {
-  myarray=`find ./ -maxdepth 1 -name ".lic"`
+  myarray=`find ./ -maxdepth 1 -name "*.lic"`
+  echo $myarray
 
   count=${#myarray[@]}
+
   #Abort if we do not find a lic file. 
-  if [ ! $count -eq 1 ]; then
+  if [ $count -gt 1 -o "$myarray" == "" ]; then
     echo "Could not find a .lic file. Exiting now..."
-    exit -1
+    exit 1
   else
     echo "Found license file: $myarray"
   fi     
 
-  return $myarray
+  #Copy license to appropriate directory.
+  mkdir -p /opt/intel/licenses	
+  cp $myarray /opt/intel/licenses/
 }
 
 #Produce silent install configuration file.
 get_init_file()
 {
-  cat << EOF > silent_install.ini
-    ACTIVATION=exist_lic
-    CONTINUE_WITH_INSTALLDIR_OVERWRITE=yes
-    CONTINUE_WITH_OPTIONAL_ERROR=yes
-    PSET_INSTALL_DIR=/opt/intel
-    INSTALL_MODE=NORPM
-    ACCEPT_EULA=accept
-    SEND_USAGE_DATA=no 
-  EOF
+cat << EOF > silent_install.ini
+ACTIVATION=exist_lic
+CONTINUE_WITH_INSTALLDIR_OVERWRITE=yes
+CONTINUE_WITH_OPTIONAL_ERROR=yes
+PSET_INSTALL_DIR=/opt/intel
+INSTALL_MODE=NORPM
+ACCEPT_EULA=accept
+SEND_USAGE_DATA=no 
+EOF
 }    
 
 #For Debian systems (Linux Mint, Ubuntu, etc) only, check if the dependencies are installed, otherwise install them
@@ -227,7 +231,7 @@ fortran()
 	#Now extract the files, cd to the new directory and run Intel's installation script
 	tar -xzvf l_fc*.tgz
 	cd l_fc*
-	./install.sh 
+	./install.sh --silent $1
 
 	#Add the compilers to the PATH (only do it if it was not done already) 
 	if [ ! -f /etc/profile.d/intel.sh -o "`cat /etc/profile.d/intel.sh`" != "export PATH=/opt/intel/composer_xe_$version_fortran/bin/intel64:\$PATH" ]; then
@@ -237,7 +241,8 @@ fortran()
 
 cplusplus() 
 {
-	cd $dir0
+	cd $dir0	
+	
 	if [ -f l_ccompxe_intel64_$version_cpp.tgz ]; then
 		echo "Found l_ccompxe_intel64_$version_cpp.tgz"
 	else  
@@ -258,7 +263,7 @@ cplusplus()
 	#Now extract the files, cd to the new directory and run Intel's installation script
 	tar -xzvf l_c*.tgz
 	cd l_c*
-	./install.sh 
+	./install.sh --silent $1
 
 		#Add the compilers to the PATH (only do it if it was not done already) 
 	if [ ! -f /etc/profile.d/intel.sh -o "`cat /etc/profile.d/intel.sh`" != "export PATH=/opt/intel/composer_xe_$version_cpp/bin/intel64:\$PATH" ]; then
@@ -267,7 +272,8 @@ cplusplus()
 }
 
 #Find license file.
-license=check_license
+check_license
+license=$(check_license)
 
 #Write configuration file.
 get_init_file 
@@ -287,12 +293,15 @@ fi
 #Record the current directory in case Intel's script changes it
 dir0=`pwd`
 
+license="$dir0"/"$license"
+echo "Table: $license"
+
 #Both Fortran and C/C++ are installed if user runs the script with no arguments or with "all" as the first argument. Otherwise, only one of the compilers is installed.
 if [ "$1" = "" -o "$1" = "all" ]; then 
-	fortran
-	cplusplus
+	fortran $license
+	cplusplus $license
 elif [ $1 = "fortran" -o $1 = "cplusplus" ]; then
-	$1
+	$1 $license
 fi
 
 #Clean up
