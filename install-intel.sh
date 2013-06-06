@@ -43,8 +43,7 @@ source_cpp="http://registrationcenter-download.intel.com/akdlm/irc_nas/3173/l_cc
 check_license()
 {
   myarray=`find ./ -maxdepth 1 -name "*.lic"`
-  echo $myarray
-
+  
   count=${#myarray[@]}
 
   #Abort if we do not find a lic file. 
@@ -63,7 +62,7 @@ check_license()
 #Produce silent install configuration file.
 get_init_file()
 {
-cat << EOF > silent_install.ini
+cat << EOF > $1
 ACTIVATION=exist_lic
 CONTINUE_WITH_INSTALLDIR_OVERWRITE=yes
 CONTINUE_WITH_OPTIONAL_ERROR=yes
@@ -273,10 +272,10 @@ cplusplus()
 
 #Find license file.
 check_license
-license=$(check_license)
 
 #Write configuration file.
-get_init_file 
+silent_install=silent_install.ini
+get_init_file $silent_install
 
 #Check dependencies.
 echo "Checking dependencies..."
@@ -293,15 +292,12 @@ fi
 #Record the current directory in case Intel's script changes it
 dir0=`pwd`
 
-license="$dir0"/"$license"
-echo "Table: $license"
-
 #Both Fortran and C/C++ are installed if user runs the script with no arguments or with "all" as the first argument. Otherwise, only one of the compilers is installed.
 if [ "$1" = "" -o "$1" = "all" ]; then 
-	fortran $license
-	cplusplus $license
+	fortran $silent_install
+	cplusplus $silent_install
 elif [ $1 = "fortran" -o $1 = "cplusplus" ]; then
-	$1 $license
+	$1 $silent_install 
 fi
 
 #Clean up
