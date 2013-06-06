@@ -67,7 +67,7 @@ ACTIVATION=exist_lic
 CONTINUE_WITH_INSTALLDIR_OVERWRITE=yes
 CONTINUE_WITH_OPTIONAL_ERROR=yes
 PSET_INSTALL_DIR=/opt/intel
-INSTALL_MODE=NORPM
+INSTALL_MODE=NONRPM
 ACCEPT_EULA=accept
 SEND_USAGE_DATA=no 
 EOF
@@ -270,11 +270,14 @@ cplusplus()
 	fi
 }
 
+#Record the current directory in case Intel's script changes it
+dir0=`pwd`
+
 #Find license file.
 check_license
 
 #Write configuration file.
-silent_install=silent_install.ini
+silent_install=$dir0/silent_install.ini
 get_init_file $silent_install
 
 #Check dependencies.
@@ -288,9 +291,6 @@ elif [ -d /var/cache/pacman ]; then
 elif [ -d /var/cache/yum ]; then
 	check_rpm
 fi
-
-#Record the current directory in case Intel's script changes it
-dir0=`pwd`
 
 #Both Fortran and C/C++ are installed if user runs the script with no arguments or with "all" as the first argument. Otherwise, only one of the compilers is installed.
 if [ "$1" = "" -o "$1" = "all" ]; then 
