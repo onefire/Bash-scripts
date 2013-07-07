@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Author: onefire <onefire.myself@gmail.com>
-#Date: 11/29/2012
+#Date: 07/06/2013
 
 #UPDATE: The 2013 version works with C++! (it used to be incompatible with newer versions of gcc) 
 
@@ -28,16 +28,16 @@
 #The code installs the 64 bit only versions of the compilers, not only because the files are shorter, but because otherwise we need to get 32 bit libraries (like gcc-multilib) which, from my experience, are a pain and create all sorts of compatibility issues. Plus, in the future nobody is going to use 32 bit machines, so development for those is not going to be very important. But it should be trivial to patch it so that it installs the multilib versions.
 
 #cksums taken from Intel's website: http://software.intel.com/en-us/articles/intel-composer-xe-2013-checksums/ 
-cksumfortran="1140271310 647729243"
-cksumcpp="3813715153 1047260116"
+cksumfortran="265294600 648169849"
+cksumcpp="573686356 1048394848"
 
 #compiler versions
-version_fortran="2013.4.183"
-version_cpp="2013.4.183"
+version_fortran="2013.5.192"
+version_cpp="2013.5.192"
 
 #sources
-source_fortran="http://registrationcenter-download.intel.com/akdlm/irc_nas/3174/l_fcompxe_intel64_$version_fortran.tgz"
-source_cpp="http://registrationcenter-download.intel.com/akdlm/irc_nas/3173/l_ccompxe_intel64_$version_cpp.tgz"
+source_fortran="http://registrationcenter-download.intel.com/akdlm/irc_nas/3238/l_fcompxe_intel64_$version_fortran.tgz"
+source_cpp="http://registrationcenter-download.intel.com/akdlm/irc_nas/3243/l_ccompxe_intel64_$version_cpp.tgz"
 
 #Check if license file is present.
 check_license()
@@ -69,7 +69,7 @@ CONTINUE_WITH_OPTIONAL_ERROR=yes
 PSET_INSTALL_DIR=/opt/intel
 INSTALL_MODE=NONRPM
 ACCEPT_EULA=accept
-SEND_USAGE_DATA=no 
+SEND_USAGE_DATA=no
 EOF
 }    
 
