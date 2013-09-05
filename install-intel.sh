@@ -28,16 +28,17 @@
 #The code installs the 64 bit only versions of the compilers, not only because the files are shorter, but because otherwise we need to get 32 bit libraries (like gcc-multilib) which, from my experience, are a pain and create all sorts of compatibility issues. Plus, in the future nobody is going to use 32 bit machines, so development for those is not going to be very important. But it should be trivial to patch it so that it installs the multilib versions.
 
 #cksums taken from Intel's website: http://software.intel.com/en-us/articles/intel-composer-xe-2013-checksums/ 
-cksumfortran="265294600 648169849"
-cksumcpp="573686356 1048394848"
+cksumfortran="403953350 1076507945"
+cksumcpp="1405387282 2693495963"
 
 #compiler versions
-version_fortran="2013.5.192"
-version_cpp="2013.5.192"
+version_cpp="2013_sp1.0.080"
+version_fortran="2013_sp1.0.080"
+#version_cpp="2013.5.192"
 
 #sources
-source_fortran="http://registrationcenter-download.intel.com/akdlm/irc_nas/3238/l_fcompxe_intel64_$version_fortran.tgz"
-source_cpp="http://registrationcenter-download.intel.com/akdlm/irc_nas/3243/l_ccompxe_intel64_$version_cpp.tgz"
+source_fortran="http://registrationcenter-download.intel.com/akdlm/irc_nas/3381/l_fcompxe_$version_fortran.tgz"
+source_cpp="http://registrationcenter-download.intel.com/akdlm/irc_nas/3380/l_ccompxe_$version_cpp.tgz"
 
 #Check if license file is present.
 check_license()
@@ -63,15 +64,16 @@ check_license()
 get_init_file()
 {
 cat << EOF > $1
-ACTIVATION=exist_lic
+ACTIVATION_TYPE=exist_lic
 CONTINUE_WITH_INSTALLDIR_OVERWRITE=yes
 CONTINUE_WITH_OPTIONAL_ERROR=yes
 PSET_INSTALL_DIR=/opt/intel
 INSTALL_MODE=NONRPM
 ACCEPT_EULA=accept
-SEND_USAGE_DATA=no
+PHONEHOME_SEND_USAGE_DATA=no
 EOF
 }    
+#SEND_USAGE_DATA=no
 
 #For Debian systems (Linux Mint, Ubuntu, etc) only, check if the dependencies are installed, otherwise install them
 check_debian() 
@@ -209,8 +211,8 @@ fortran()
 {
 	cd $dir0
 	#Check if the correct version exists in the current directory. If it does not, download it.
-	if [ -f l_fcompxe_intel64_$version_fortran.tgz ]; then
-		echo "Found l_fcompxe_intel64_$version_fortran.tgz" 
+	if [ -f l_fcompxe_$version_fortran.tgz ]; then
+		echo "Found l_fcompxe_$version_fortran.tgz" 
 	else
 
 	#Download the multilib version of the compiler
@@ -219,7 +221,7 @@ fortran()
 
 	#Check the authenticity of the download
 	echo "Checking authenticity of the download..."
-	echo "$cksumfortran l_fcompxe_intel64_$version_fortran.tgz" > cksumfortran.txt
+	echo "$cksumfortran l_fcompxe_$version_fortran.tgz" > cksumfortran.txt
 	if [ "`cksum l_f*.tgz`" = "`cat cksumfortran.txt`" ]; then
 		echo "CKSUM TEST PASSED! PROCEEDING WITH THE INSTALLATION OF THE INTEL FORTRAN COMPILER..."
 	elif [ "`cksum l_f*.tgz`" != "`cat cksumfortran.txt`" ]; then
@@ -242,8 +244,8 @@ cplusplus()
 {
 	cd $dir0	
 	
-	if [ -f l_ccompxe_intel64_$version_cpp.tgz ]; then
-		echo "Found l_ccompxe_intel64_$version_cpp.tgz"
+	if [ -f l_ccompxe_$version_cpp.tgz ]; then
+		echo "Found l_ccompxe_$version_cpp.tgz"
 	else  
 	#Download the multilib C/C++ compiler (the 2013 version works with C++!) 
 		wget $source_cpp
@@ -251,7 +253,7 @@ cplusplus()
 
 	#Check the authenticity of the download
 	echo "Checking authenticity of the download..."
-	echo "$cksumcpp l_ccompxe_intel64_$version_cpp.tgz" > cksumc++.txt
+	echo "$cksumcpp l_ccompxe_$version_cpp.tgz" > cksumc++.txt
 	if [ "`cksum l_c*.tgz`" = "`cat cksumc++.txt`" ]; then
 		echo "CKSUM TEST PASSED! PROCEEDING WITH THE INSTALLATION OF THE INTEL C/C++ COMPILERS..."
 	elif [ "`cksum l_c*.tgz`" != "`cat cksumc++.txt`" ]; then
@@ -302,6 +304,6 @@ fi
 
 #Clean up
 cd $dir0
-rm -rf l_fcompxe_intel64_$version_fortran l_ccompxe_intel64_$version_cpp
+rm -rf l_fco* l_cco*
 rm *cksum*.txt
 
